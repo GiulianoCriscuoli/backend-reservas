@@ -9,17 +9,21 @@ use App\Models\User;
 use App\Models\Unit;
 use Exception;
 use DB;
+
 class AuthController extends Controller
 {
-    public function unauthorized () {
+    public function unauthorized()
+    {
 
         return response()->json([
-            'error' => 'Não autorizado'
+            'error' => 'Não autorizado',
+            'authorization' => 'false'
 
         ], 401);
     }
 
-    public function register (Request $request) {
+    public function register(Request $request)
+    {
 
         try {
 
@@ -74,7 +78,7 @@ class AuthController extends Controller
 
             // se houver erro no token, retorna erro
 
-            if(!$token) {
+            if (!$token) {
 
                 $status['error'] = 'Ocorreu um erro interno';
                 return $status;
@@ -89,29 +93,29 @@ class AuthController extends Controller
 
             // Fazendo o GET de todas as unidades que o usuário da sessão é proprietário
 
-            $properties = Unit::select(['id','name'])
-            ->where('id_owner', $user['id'])
-            ->get();
+            $properties = Unit::select(['id', 'name'])
+                ->where('id_owner', $user['id'])
+                ->get();
 
             $status['user']['properties'] = $properties->isNotEmpty() ?  $properties : [];
 
             DB::commit();
 
             return $status;
-
         } catch (Exception $e) {
 
-           $status['error'] = $e->getMessage();
+            $status['error'] = $e->getMessage();
 
-           DB::rollBack();
+            DB::rollBack();
 
-           return response()->json([
+            return response()->json([
                 'error' => $status['error']
             ], 500);
         }
     }
 
-    public function login (Request $request){
+    public function login(Request $request)
+    {
 
         try {
 
@@ -136,7 +140,7 @@ class AuthController extends Controller
 
             // se houver erro no token, retorna erro
 
-            if(!$token) {
+            if (!$token) {
 
                 $status['error'] = 'CPF e/ou senha estão errados!';
                 return $status;
@@ -151,16 +155,15 @@ class AuthController extends Controller
 
             // Fazendo o GET de todas as unidades que o usuário da sessão é proprietário
 
-            $properties = Unit::select(['id','name'])
-            ->where('id_owner', $user['id'])
-            ->get();
+            $properties = Unit::select(['id', 'name'])
+                ->where('id_owner', $user['id'])
+                ->get();
 
             $status['user']['properties'] = $properties->isNotEmpty() ?  $properties : [];
 
             DB::commit();
 
             return $status;
-
         } catch (Exception $e) {
 
             $status['error'] = $e->getMessage();
@@ -168,35 +171,37 @@ class AuthController extends Controller
             DB::rollBack();
 
             return response()->json([
-                 'error' => $status['error']
-             ], 500);
-         }
+                'error' => $status['error']
+            ], 500);
+        }
     }
 
-    public function validateToken() {
+    public function validateToken()
+    {
 
         $status = ['error' => ''];
 
         $user = auth()->user();
         $status['user'] = $user;
 
-        $properties = Unit::select(['id','name'])
-        ->where('id_owner', $user['id'])
-        ->get();
+        $properties = Unit::select(['id', 'name'])
+            ->where('id_owner', $user['id'])
+            ->get();
 
         $status['user']['properties'] = $properties->isNotEmpty() ?  $properties : [];
+        $status['authorization'] = true;
 
         return $status;
-
     }
 
-    public function logout () {
+    public function logout()
+    {
 
         $status = ['error' => ''];
 
         auth()->logout();
+        $status['logout'] = true;
 
         return $status;
     }
-
 }

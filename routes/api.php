@@ -14,17 +14,13 @@ use App\Http\Controllers\WallController;
 use App\Http\Controllers\UserController;
 use App\Models\Reservation;
 
-Route::get('/ping', function (Request $request) {
-    return ['pong' => true];
-});
-
 Route::get('/401', [AuthController::class, 'unauthorized'])->name('login');
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 
-Route::middleware(('auth:api'))->group(function() {
+Route::middleware('auth:api')->group(function() {
 
     Route::post('/auth/validate', [AuthController::class, 'validateToken']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -36,7 +32,7 @@ Route::middleware(('auth:api'))->group(function() {
 
     // Documentos
 
-    Route::get('docs', [DocController::class, 'getall']);
+    Route::get('docs', [DocController::class, 'getAll']);
 
     // Livro de ocorrências
 
@@ -45,6 +41,7 @@ Route::middleware(('auth:api'))->group(function() {
     Route::post('/warning/file', [WarningController::class, 'addWarningFile']);
 
     // Boletos
+
     Route::get('/billets', [BilletController::class, 'getAll']);
 
     // Achados e perdidos
