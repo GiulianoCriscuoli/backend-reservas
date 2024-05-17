@@ -11,7 +11,12 @@ class BilletController extends Controller
     public function getAll(Request $request) {
 
         $status = ['error' => '', 'list' => []];
+
+        // passo por get a unidade 
+
         $unit = $request->input('unit');
+
+        // verifico se ela existe
 
         if(!$unit) {
             $status['error'] = 'A unidade precisa ser preenchida';
@@ -20,6 +25,8 @@ class BilletController extends Controller
 
         $user = auth()->user();
 
+        // consulto as unidades do usuário logado
+
         $units = Unit::where('id', $unit)
         ->where('id_owner', $user->id)->get();
 
@@ -27,6 +34,8 @@ class BilletController extends Controller
             $status['error'] = 'Nenhuma unidade foi encontrada';
             return $status;
         }
+
+        // caso encontre, pego os boletos da unidade 
 
         foreach ($units as $u) {
             $billetsUserLogged = Billet::where('id_unit', $u->id)->get();
